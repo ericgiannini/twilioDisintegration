@@ -1,18 +1,22 @@
 
 
-Schematic: Agora’s iOS SDK Mapping Guide for Twilio Video functionalities
+# Schematic: Agora’s iOS SDK Mapping Guide for Twilio Video functionalities
 
 
 
 ## Practical Coding Implementations of Mapped Functions 
 ### Importing SDK
 
+#### Twilio
 ```Swift
 import TwilioVideo
+```
+#### Agora
+```Swift
 import AgoraRtcEngineKit
 ```
 ### Accessing SDK / Initialization
-#### Twilo: instances
+#### Twilio: instances
 
 ```Swift
   // Video SDK components
@@ -24,13 +28,15 @@ import AgoraRtcEngineKit
     var remoteView: TVIVideoView?
 ```
 
-Agora: a single instance 
+#### Agora: a single instance 
 ```Swift
 let agoraKit: AgoraRtcEngine 
 ``` 
 
-Toggle Microphone
-Twilio: self.localAudioTrack?.isEnabled
+### Toggle Microphone
+#### Twilio: self.localAudioTrack?.isEnabled
+
+```Swift
   @IBAction func toggleMic(sender: AnyObject) {
         if (self.localAudioTrack != nil) {
             self.localAudioTrack?.isEnabled = !(self.localAudioTrack?.isEnabled)!
@@ -40,21 +46,26 @@ Twilio: self.localAudioTrack?.isEnabled
                 self.micButton.setTitle("Mute", for: .normal)
             } else {
                 self.micButton.setTitle("Unmute", for: .normal)
-            
+```           
         
     
 
-Agora: agoraKit.muteLocalAudioStream(sender.isSelected)
+#### Agora: agoraKit.muteLocalAudioStream(sender.isSelected)
+
+```Swift
 @IBAction func didClickMuteButton(_ sender: UIButton) {
     sender.isSelected = !sender.isSelected
     agoraKit.muteLocalAudioStream(sender.isSelected)
     resetHideButtonsTimer()
 }
+```
 
 
-Toggle Camera
-Twilio: TVICameraSource.captureDevice(for: .back)
+### Toggle Camera
+#### Twilio: TVICameraSource.captureDevice(for: .back)
 
+
+```Swift
 @objc func flipCamera() {
         var newDevice: AVCaptureDevice?
 
@@ -71,50 +82,60 @@ Twilio: TVICameraSource.captureDevice(for: .back)
                         self.logMessage(messageText: "Error selecting capture device.\ncode = \((error as NSError).code) error = \(error.localizedDescription)")
                     } else {
                         self.previewView.shouldMirror = (captureDevice.position == .front)
-                    
+```                    
                 
             
         
     
 
-Agora: agoraKit.switchCamera()
+#### Agora: agoraKit.switchCamera()
 @IBAction func didClickSwitchCameraButton(_ sender: UIButton) {
     sender.isSelected = !sender.isSelected
     agoraKit.switchCamera()
     resetHideButtonsTimer()
 }
 
-Leave Room / Channel 
-Twilio: self.room!.disconnect()
+### Leave Room / Channel 
+#### Twilio: self.room!.disconnect()
+```Swift
     @IBAction func disconnect(sender: AnyObject) {
         self.room!.disconnect()
         logMessage(messageText: "Attempting to disconnect from room \(room!.name)")
-    
-Agora: agoraKit.leaveChannel(nil)
+```
+
+#### Agora: agoraKit.leaveChannel(nil)
+
+```Swift
 func leaveChannel() {
     agoraKit.leaveChannel(nil)
     logMessage(messageText: "Attempting to leave channel")
     agoraKit = nil
 }
+```
 
-Join Room / Channel 
-Twilio: TwilioVideo.connect(with: connectOptions, delegate: self)
+### Join Room / Channel 
+
+
+#### Twilio: TwilioVideo.connect(with: connectOptions, delegate: self)
+
+```Swift 
 room = TwilioVideo.connect(with: connectOptions, delegate: self)
+```
 
-Agora: agoraKit.joinChannel()
+#### Agora: agoraKit.joinChannel()
+```Swift
 func joinChannel() {
     agoraKit.joinChannel(byKey: nil, channelName: "demoChannel1", info:nil, uid:0) {[weak self] (sid, uid, elapsed) -> Void in
         if let weakSelf = self {
             weakSelf.agoraKit.setEnableSpeakerphone(true)
             UIApplication.shared.isIdleTimerDisabled = true
-       
-    
 }
+```
 
+### Configure Video 
+#### Twilio: TVIConnectOptions.init(token: accessToken) {(builder) in}
 
-Configure Video 
-Twilio: TVIConnectOptions.init(token: accessToken) {(builder) in}
-
+```Swift
 / Preparing the connect options with the access token that we fetched (or hardcoded).
         let connectOptions = TVIConnectOptions.init(token: accessToken) { (builder) in
             
@@ -135,12 +156,13 @@ Twilio: TVIConnectOptions.init(token: accessToken) {(builder) in}
             // Use the preferred encoding parameters
             if let encodingParameters = Settings.shared.getEncodingParameters() {
                 builder.encodingParameters = encodingParameters
+ ```           
             
-            
 
 
-Agora: agoraKit.setVideoEncoderConfiguration()
+#### Agora: agoraKit.setVideoEncoderConfiguration()
 
+```Swift
 func setupVideo() {
     agoraKit.enableVideo()  // Enables video mode.
     agoraKit.setVideoEncoderConfiguration(
@@ -150,11 +172,12 @@ func setupVideo() {
                             orientationMode: .adaptative)
     ) // Default video profile is 360P
 }
+```
 
+### Configure remote tokenization
+#### Twilio: accessToken = try TokenUtils.fetchToken(url: tokenUrl)
 
-Configure remote tokenization
-Twilio: accessToken = try TokenUtils.fetchToken(url: tokenUrl)
-
+```Swift
 // MARK: IBActions
     @IBAction func connect(sender: AnyObject) {
         // Configure access token either from server or manually.
@@ -166,12 +189,16 @@ Twilio: accessToken = try TokenUtils.fetchToken(url: tokenUrl)
                 let message = "Failed to fetch access token"
                 logMessage(messageText: message)
                 return
-            
+}
+```            
         
-Agora:  agoraKit.joinChannel
+#### Agora:  agoraKit.joinChannel
+
+```Swift
 func joinChannel() {
   agoraKit.joinChannel(by Token: nil, channelId: "demoChannel1", info:nil, uid:0){[weak self] (sid, uid, elapsed) -> Void in
-      // Join channel "demoChannel1"
-  
+      // Join channel "demoChannel1" 
 }
+```
+
 
