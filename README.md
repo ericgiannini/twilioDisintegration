@@ -89,11 +89,14 @@ let agoraKit: AgoraRtcEngine
     
 
 #### Agora: agoraKit.switchCamera()
+
+```Swift
 @IBAction func didClickSwitchCameraButton(_ sender: UIButton) {
     sender.isSelected = !sender.isSelected
     agoraKit.switchCamera()
     resetHideButtonsTimer()
 }
+```
 
 ### Leave Room / Channel 
 #### Twilio: self.room!.disconnect()
